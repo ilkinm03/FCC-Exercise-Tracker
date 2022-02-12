@@ -4,7 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
-mongoose.connect(ATLAS_URI);
+mongoose.connect(process.env.ATLAS_URI);
 
 const app = express();
 

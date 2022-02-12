@@ -22,6 +22,13 @@ app.get("/", (req, res) => {
    res.sendFile(__dirname + "/views/index.html");
 });
 
+app.get("/api/users", (req, res) => {
+   User.find({}, (err, foundUsers) => {
+      if (err || !foundUsers) return console.log(err);
+      else res.json(foundUsers);
+   });
+});
+
 app.post("/api/users", (req, res) => {
    const newUser = new User({
       username: req.body.username,

@@ -17,14 +17,7 @@ const userSchema = new mongoose.Schema({
    username: String,
 });
 
-const exerciseSchema = new mongoose.Schema({
-   description: String,
-   duration: Number,
-   date: String,
-});
-
 const User = new mongoose.model("User", userSchema);
-const Exercise = new mongoose.model("Exercise", exerciseSchema);
 
 app.get("/", (req, res) => {
    res.sendFile(__dirname + "/views/index.html");
@@ -49,33 +42,62 @@ app.post("/api/users", (req, res) => {
 });
 
 app.post("/api/users/:_id/exercises", (req, res) => {
-   const requestedId = req.params._id;
+   const userID = req.body[":_id"] || req.params._id;
+   const descriptionEntered = req.body.description;
+   const durationEntered = req.body.duration;
+   const dateEntered = req.body.date;
 
-   if (!req.body.date) {
-    req.body.date = new Date().toDateString();
-  }
-  
+   console.log(userID, descriptionEntered, durationEntered, dateEntered);
 
-   User.findById(requestedId, (err, foundUser) => {
-      if (err || !foundUser) res.send(err);
-      else {
+   if (!userID) {
+      res.json("Path `userID` is required.");
+      return;
+   }
+   if (!descriptionEntered) {
+      res.json("Path `description` is required.");
+      return;
+   }
+   if (!durationEntered) {
+      res.json("Path `duration` is required.");
+      return;
+   }
+
+   User.findOne({ _id: userID }, (err, data) => {
+      if (err) {
+         res.json("Invalid userID");
+         return console.log(err);
+      }
+      if (!data) {
+         res.json("Unknown userID");
+         return;
+      } else {
+         console.log(data);
+         const usernameMatch = data.username;
+
          const newExercise = new Exercise({
-            _id: req.body._id,
-            description: req.body.description,
-            duration: req.body.duration,
-            date: req.body.date,
+            username: usernameMatch,
+            description: descriptionEntered,
+            duration: durationEntered,
          });
 
-         newExercise.save((err) => {
-            if (err) return console.log(err);
-         });
+         if (dateEntered) {
+            newExercise.date = dateEntered;
+         }
 
-         res.json({
-            _id: foundUser._id,
-            username: foundUser.username,
-            date: newExercise.date,
-            duration: newExercise.duration,
-            description: newExercise.description,
+         newExercise.save((err, data) => {
+            if (error) return console.log(err);
+
+            console.log(data);
+
+            const exerciseObject = {
+               _id: userID,
+               username: data.username,
+               date: data.date.toDateString(),
+               duration: data.duration,
+               description: data.description,
+            };
+
+            res.json(exerciseObject);
          });
       }
    });

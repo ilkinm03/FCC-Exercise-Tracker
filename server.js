@@ -14,25 +14,13 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const userSchema = new Schema({
-   username: {
-      type: String,
-      required: true,
-   },
+   username: String,
 });
 
 const exerciseSchema = new mongoose.Schema({
-   username: {
-      type: String,
-      required: true,
-   },
-   description: {
-      type: String,
-      required: true,
-   },
-   duration: {
-      type: Number,
-      required: true,
-   },
+   username: String,
+   description: String,
+   duration: Number,
    date: {
       type: Date,
       default: Date.now(),

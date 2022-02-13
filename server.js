@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const e = require("express");
 
 mongoose.connect(process.env.ATLAS_URI);
 
@@ -13,10 +14,11 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const userSchema = new mongoose.Schema({
-   username: String,
+   username: String
 });
 
 const exerciseSchema = new mongoose.Schema({
+   _id: String,
    description: String,
    duration: Number,
    date: Date,
@@ -48,20 +50,31 @@ app.post("/api/users", (req, res) => {
 });
 
 app.post("/api/users/:_id/exercises", (req, res) => {
-   const requestedId = req.params._id;
-   if (!req.body.date.length) {
-      req.body.date = new Date().toDateString();
-   }
+   const { _id, description, duration, date } = req.body;
 
-   User.findById(requestedId, (err, foundUser) => {
-      if (err || !foundUser) return console.log(err);
+   if (req.body.date === "") req.body.date = new Date().toDateString();
+
+   User.findById(_id, (err, data) => {
+      if (err || !data) res.send(err);
       else {
-         res.json({
-            username: foundUser.username,
-            description: req.body.description,
-            duration: req.body.duration,
-            date: req.body.date,
-            _id: foundUser._id,
+         const newExercise = new Exercise({
+            _id,
+            description,
+            duration,
+            date,
+         });
+
+         newExercise.save((err, data) => {
+            if (err) return console.log(err);
+            else {
+               res.json({
+                  _id,
+                  username: data.username,
+                  description,
+                  duration,
+                  date,
+               });
+            }
          });
       }
    });

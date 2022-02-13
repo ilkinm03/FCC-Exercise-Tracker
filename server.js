@@ -13,11 +13,34 @@ app.use(cors());
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const userSchema = new mongoose.Schema({
-   username: String,
+const userSchema = new Schema({
+   username: {
+      type: String,
+      required: true,
+   },
+});
+
+const exerciseSchema = new mongoose.Schema({
+   username: {
+      type: String,
+      required: true,
+   },
+   description: {
+      type: String,
+      required: true,
+   },
+   duration: {
+      type: Number,
+      required: true,
+   },
+   date: {
+      type: Date,
+      default: Date.now(),
+   },
 });
 
 const User = new mongoose.model("User", userSchema);
+const Exercise = new mongoose.model("Exercise", exerciseSchema);
 
 app.get("/", (req, res) => {
    res.sendFile(__dirname + "/views/index.html");

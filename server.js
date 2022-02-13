@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const userSchema = new Schema({
+const userSchema = new mongoose.Schema({
    username: String,
 });
 
